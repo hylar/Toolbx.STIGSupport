@@ -10,8 +10,27 @@ Function New-CheckList {
 
         [Parameter(Mandatory = $true)]
         [string]
-        $Destination
+        $Destination,
 
+        [Parameter()]
+        [string]
+        $HostName,
+
+        [Parameter()]
+        [string]
+        $HostIP,
+
+        [Parameter()]
+        [string]
+        $HostGUID,
+
+        [Parameter()]
+        [string]
+        $HostMAC,
+
+        [Parameter()]
+        [string]
+        $HostFQDN
     )
 
     #TODO: Create a Dynamic Parameter to create a list of names from the Active folder under STIGData.
@@ -31,11 +50,11 @@ Function New-CheckList {
     $assetElements = [ordered] @{
         'ROLE'            = 'None'
         'ASSET_TYPE'      = 'Computing'
-        'HOST_NAME'       = ''
-        'HOST_IP'         = ''
-        'HOST_MAC'        = ''
-        'HOST_GUID'       = ''
-        'HOST_FQDN'       = ''
+        'HOST_NAME'       = "$HostName"
+        'HOST_IP'         = "$HostIP"
+        'HOST_MAC'        = "$HostMAC"
+        'HOST_GUID'       = "$HostGUID"
+        'HOST_FQDN'       = "$HostFQDN"
         'TECH_AREA'       = ''
         'TARGET_KEY'      = '2350'
         'WEB_OR_DATABASE' = 'false'
