@@ -1,5 +1,6 @@
 Function Export-Checklist {
 
+    [CmdletBinding()]
     Param(
         [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
         [XML]

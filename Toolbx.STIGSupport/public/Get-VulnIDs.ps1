@@ -1,5 +1,6 @@
 Function Get-VulnIDs {
 
+    [CmdletBinding()]
     Param(
         [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
         [XML]

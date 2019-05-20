@@ -1,5 +1,6 @@
 Function Set-VulnIDFinding
 {
+    [CmdletBinding()]
     Param
     (
         [Parameter(Mandatory=$true, ValueFromPipeline = $true)]

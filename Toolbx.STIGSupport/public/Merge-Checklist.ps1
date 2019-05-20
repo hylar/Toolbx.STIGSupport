@@ -1,5 +1,6 @@
 Function Merge-Checklist {
 
+    [CmdletBinding()]
     Param(
 
         [Parameter(Mandatory=$true)]

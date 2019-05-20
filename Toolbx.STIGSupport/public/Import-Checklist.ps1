@@ -1,5 +1,6 @@
 Function Import-Checklist {
 
+    [CmdletBinding()]
     Param(
         [Parameter(Mandatory = $true)]
         [ValidateScript( {Test-Path -Path $_})]
