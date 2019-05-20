@@ -7,7 +7,7 @@ ForEach ($folder in $functionFolders) {
 
         Write-Verbose -Message "Importing from $folder"
 
-        $functions = Get-ChildItem -Path $folderPath -Filter '*.ps1' -Recurse
+        $functions = Get-ChildItem -Path $folderPath -Filter '*.ps1' -Exclude "*.check.ps1" -Recurse
 
         ForEach ($function in $functions) {
             Write-Verbose -Message "  Importing $($function.BaseName)"
