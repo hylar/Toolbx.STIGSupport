@@ -9,19 +9,21 @@
 [CmdletBinding()]
 Param($PreCheck)
 
-Write-Verbose "Checking - V-####"
+Write-Verbose "Checking - V-18395"
 
 # Initial Variables
 $Results = @{
-    VulnID   = "V-####"
-    Details  = "$($PreCheck.EXEConfigs.Count)"
-    Comments = ""
-    Result   = ""
+    VulnID   = "V-18395"
+    RuleID   = ""
+    Details  = "This was a test of the details"
+    Comments = "This was a test of the comments"
+    Status   = "Open"
 }
 
 #Perform necessary check
 
 
+Write-Verbose "Completed Checking - V-18395 [$($Results.Status)]"
 
 #Return results
 return $Results

@@ -7,7 +7,7 @@ Function Start-STIGViewer {
         Start-Process -FilePath .\Toolbx.STIGSupport\tools\STIGViewer-2.9.jar
     }
     Catch {
-        Write-Error $_
+        $PSCmdlet.ThrowTerminatingError( $_ )
     }
 
 }

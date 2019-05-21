@@ -11,6 +11,10 @@ function Set-VulnIDFindingAttribute {
         [String]
         $VulnID,
 
+        [Parameter(ValueFromPipeline = $true)]
+        [String]
+        $RuleID,
+
         [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
         [ValidateSet(
             "SEVERITY_JUSTIFICATION",
@@ -28,7 +32,20 @@ function Set-VulnIDFindingAttribute {
 
     try {
 
-        ((Select-XML -Xml $Checklist -XPath "//STIG_DATA[VULN_ATTRIBUTE='Vuln_Num' and ATTRIBUTE_DATA='$VulnID']").Node.ParentNode).$Attribute = $Value
+        If ($PSBoundParameters.ContainsKey('RuleID') -and $RuleID -ne '') {
+
+            $xObject = (Select-XML -Xml $Checklist -XPath "//STIG_DATA[VULN_ATTRIBUTE='Rule_ID' and ATTRIBUTE_DATA='$RuleID']").Node.ParentNode
+
+            $xObject | ForEach-Object { $_.$Attribute = "$Value" }
+
+        }
+        else {
+
+            $xObject = (Select-XML -Xml $Checklist -XPath "//STIG_DATA[VULN_ATTRIBUTE='Vuln_Num' and ATTRIBUTE_DATA='$VulnID']").Node.ParentNode
+
+            $xObject | ForEach-Object { $_.$Attribute = "$Value" }
+
+        }
 
     }
     catch {

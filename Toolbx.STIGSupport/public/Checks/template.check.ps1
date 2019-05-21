@@ -16,7 +16,7 @@ $Results = @{
     VulnID   = "V-####"
     Details  = ""
     Comments = ""
-    Result   = ""
+    Status   = ""
 }
 
 #Perform necessary check
