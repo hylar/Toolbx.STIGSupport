@@ -27,20 +27,14 @@ function Start-STIGCheck {
     # Import STIG Checklist
     $CKL = Import-Checklist -Path $Checklist
 
-    # Get Host Data.
-    $FQDN = (Get-WmiObject win32_computersystem).DNSHostName + "." + (Get-WmiObject win32_computersystem).Domain
-    $IP = [System.Net.Dns]::GetHostByName($env:computerName).Addresslist.IPAddressToString
-    $MAC = (Get-WmiObject -Class Win32_NetworkAdapterConfiguration | Where-Object { $_.IpAddress -eq $IP }).MACAddress
-
-    # Set Host Data for STIG Checklist
-    #TODO: Create function to set Host Data.
-
+    # Set Host Data.
+    Set-ChecklistHostData
 
     # Run pre.check.ps1 if it exists.
     $PreCheck = $null
     if (Test-Path "$PSScriptRoot\$STIG\pre.check.ps1") {
         Write-Verbose "Running $STIG Pre Check"
-        #$PreCheck = . "$PSScriptRoot\$STIG\pre.check.ps1"
+        $PreCheck = . "$PSScriptRoot\$STIG\pre.check.ps1"
     }
 
     # Run VulnID Checks
