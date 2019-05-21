@@ -35,7 +35,7 @@ function Start-STIGCheck {
 
         Write-Verbose "Running $STIG Pre Check"
         $PreCheck = . "$PSScriptRoot\$STIG\pre.check.ps1"
-
+        Write-Verbose $PreCheck
     }
 
     # Run VulnID Checks
