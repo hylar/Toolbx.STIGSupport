@@ -2,19 +2,19 @@
 .SYNOPSIS
     This checks for compliancy on V-####
 
-.PARAMETER BeginData
-    Input data as returned by the begin.ps1 script for this stig. Maybe null if one is not provided.
+.PARAMETER PreCheck
+    Input data as returned by the pre.check.ps1 script for this stig.
 #>
 
 [CmdletBinding()]
-Param($PreCheckData)
+Param($PreCheck)
 
 Write-Verbose "Checking - V-####"
 
 # Initial Variables
 $Results = @{
     VulnID   = "V-####"
-    Details  = ""
+    Details  = "$($PreCheck.EXEConfigs.Count)"
     Comments = ""
     Result   = ""
 }

@@ -11,7 +11,7 @@ function Start-STIGCheck {
         # Specify the path to the STIG Checklist to populate.
         [Parameter(Mandatory = $true)]
         [ValidateScript( { Test-Path -Path $_ })]
-        $CKL,
+        $Checklist,
 
         # Select the STIG check to perform.
         [Parameter(Mandatory = $true)]
@@ -25,17 +25,15 @@ function Start-STIGCheck {
     $StartTime = Get-Date
 
     # Import STIG Checklist
-    $CKLData = Import-Checklist -Path $CKL
+    $CKL = Import-Checklist -Path $Checklist
 
     # Get Host Data.
 
     # Run pre.check.ps1 if it exists.
     $PreCheck = $null
     if (Test-Path "$PSScriptRoot\$STIG\pre.check.ps1") {
-
         Write-Verbose "Running $STIG Pre Check"
         $PreCheck = . "$PSScriptRoot\$STIG\pre.check.ps1"
-        Write-Verbose $PreCheck
     }
 
     # Run VulnID Checks
@@ -44,15 +42,19 @@ function Start-STIGCheck {
     $checks | ForEach-Object {
 
         Write-Verbose "Running $STIG Check - $($($_.Name).split(".")[0])"
+        Write-Verbose "Script Path: $PSScriptRoot\$STIG\$($_.Name)"
 
         # Perform Check
+        $check = . "$PSScriptRoot\$STIG\$($_.Name)" $PreCheck
 
         # Update Checklist
+
 
     }
 
 
     # Save Checklist
+    Export-Checklist -Checklist $CKL -Path $Checklist
 
     # Output How long it took
     Write-Verbose "$STIG Check Took $(((Get-Date) - $StartTime).TotalSeconds) seconds to complete"
