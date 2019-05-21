@@ -6,3 +6,4 @@
     Input data as returned by the begin.ps1 script for this stig. Maybe null if one is not provided.
 #>
 
+return "This was a test"
