@@ -10,7 +10,6 @@ $EXEConfigFiles += Get-PSDrive -PSProvider FileSystem | Select-Object Root | for
     Get-ChildItem $_.Root -Filter "*.exe.config" -ErrorAction ignore -Recurse
 }
 
-
 # Gather all machine.config files for processing in script
 Write-Verbose "Caching machine.config files. "
 
