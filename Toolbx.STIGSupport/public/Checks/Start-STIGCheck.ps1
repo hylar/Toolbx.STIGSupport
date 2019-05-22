@@ -4,10 +4,6 @@ function Start-STIGCheck {
     [CmdletBinding()]
     param (
 
-        # Specify the Host name to be used for the STIG check. By Default it grabs the local computer name using the $ENV:ComputerName variable.
-        [Parameter()]
-        $HostName = $env:COMPUTERNAME,
-
         # Specify the path to the STIG Checklist to populate.
         [Parameter(Mandatory = $true)]
         [ValidateScript( { Test-Path -Path $_ })]
@@ -28,12 +24,12 @@ function Start-STIGCheck {
     $CKL = Import-Checklist -Path $Checklist
 
     # Set Host Data.
-    Set-ChecklistHostData
+    Set-ChecklistHostData -Checklist $CKL
 
     # Run pre.check.ps1 if it exists.
     $PreCheck = $null
     if (Test-Path "$PSScriptRoot\$STIG\pre.check.ps1") {
-        Write-Verbose "Running $STIG Pre Check"
+        Write-Verbose "[$($MyInvocation.MyCommand)] Running $STIG Pre Check"
         $PreCheck = . "$PSScriptRoot\$STIG\pre.check.ps1"
     }
 
@@ -44,8 +40,8 @@ function Start-STIGCheck {
 
         Try {
 
-            Write-Verbose "Running $STIG Check - $($($_.Name).split(".")[0])"
-            Write-Verbose "Script Path: $PSScriptRoot\$STIG\$($_.Name)"
+            Write-Verbose "[$($MyInvocation.MyCommand)] Running $STIG Check - $($($_.Name).split(".")[0])"
+            Write-Verbose "[$($MyInvocation.MyCommand)] Script Path: $PSScriptRoot\$STIG\$($_.Name)"
 
             # Perform Check
             $check = . "$PSScriptRoot\$STIG\$($_.Name)" $PreCheck
@@ -54,7 +50,7 @@ function Start-STIGCheck {
             #TODO: Create function Grab predefined data points.
 
             # Update Checklist
-            Write-Verbose "Updating $($($_.Name).split(".")[0]) Checklist - $($check.Status)"
+            Write-Verbose "[$($MyInvocation.MyCommand)] Updating $($($_.Name).split(".")[0]) Checklist - $($check.Status)"
 
             Set-VulnIDFinding -Checklist $CKL -VulnID $check.VulnID -RuleID $check.RuleID -Details $check.Details -Comments $check.Comments -Status $check.Status
 
@@ -69,6 +65,6 @@ function Start-STIGCheck {
     Export-Checklist -Checklist $CKL -Path $Checklist
 
     # Output How long it took
-    Write-Verbose "$STIG Check Took $(((Get-Date) - $StartTime).TotalSeconds) seconds to complete"
+    Write-Verbose "[$($MyInvocation.MyCommand)] $STIG Check Took $(((Get-Date) - $StartTime).TotalSeconds) seconds to complete"
 
 }

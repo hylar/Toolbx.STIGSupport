@@ -22,10 +22,10 @@ function Set-ChecklistHostData {
         }
     )
 
-    $Checklist.CHECKLIST.ASSET.HOST_NAME = $env:computerName
-    $Checklist.CHECKLIST.ASSET.HOST_FQDN = $FQDN
-    $Checklist.CHECKLIST.ASSET.HOST_IP = $IP
-    $Checklist.CHECKLIST.ASSET.HOST_MAC = $Mac
-    $Checklist.CHECKLIST.ASSET.ROLE = $HostType
+    $Checklist.CHECKLIST.ASSET.HOST_NAME = "$env:computerName"
+    $Checklist.CHECKLIST.ASSET.HOST_FQDN = "$FQDN"
+    $Checklist.CHECKLIST.ASSET.HOST_IP = "$IP"
+    $Checklist.CHECKLIST.ASSET.HOST_MAC = "$Mac"
+    $Checklist.CHECKLIST.ASSET.ROLE = "$HostType"
 
 }
