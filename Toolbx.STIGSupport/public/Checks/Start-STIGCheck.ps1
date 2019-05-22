@@ -17,6 +17,10 @@ function Start-STIGCheck {
         $STIG
     )
 
+    If ($PSBoundParameters['Debug']) {
+        $DebugPreference = 'Continue'
+    }
+
     # Start Metrics
     $StartTime = Get-Date
 
@@ -41,7 +45,7 @@ function Start-STIGCheck {
         Try {
 
             Write-Verbose "[$($MyInvocation.MyCommand)] Running $STIG Check - $($($_.Name).split(".")[0])"
-            Write-Verbose "[$($MyInvocation.MyCommand)] Script Path: $PSScriptRoot\$STIG\$($_.Name)"
+            Write-Debug "[$($MyInvocation.MyCommand)] Script Path: $PSScriptRoot\$STIG\$($_.Name)"
 
             # Perform Check
             $check = . "$PSScriptRoot\$STIG\$($_.Name)" $PreCheck

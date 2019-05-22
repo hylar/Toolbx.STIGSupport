@@ -32,15 +32,19 @@ $FullFileList | ForEach-Object {
 
     Write-Debug "[$($MyInvocation.MyCommand)] Searching $_"
 
-    $Content = (Get-Content $_ )
-    $subresult = $Content -match '(?i)typefilterlevel\s*=\s*"full"(?-i)'; #match typefilterleve ="full"
-    $subresult2 = $Content -match '(?i)<\s*channel[\w\s="]*ref\s*=\s*"http\s?(server)?"(?-i)'; #match <channel ref="http server"
-    $subresult3 = $Content -match '(?i)<\s*channel[\w\s="]*port\s*=\s*"443"[\w\s="]*ref\s*=\s*"http\s?(server)?"(?-i)'; #match <channel port="443" ref="http server"
-    $subresult4 = $Content -match '(?i)<\s*channel[\w\s="]*ref\s*=\s*"http\s?(server)?"[\w\s="]*port\s*=\s*"443"(?-i)'; #match <channel ref="http server" port="443"
+    $Content = $null
+    $Content = (Get-Content $_ -ErrorAction SilentlyContinue )
 
-    if ($subresult -and $subresult2 -and -not ($subresult3 -or $subresult4)) {
-        $found = $true;
-        $Results.Comments = "$($Results.Comments)`r`n" + $_.FullName
+    if ($content -ne $null) {
+        $subresult = $Content -match '(?i)typefilterlevel\s*=\s*"full"(?-i)'; #match typefilterleve ="full"
+        $subresult2 = $Content -match '(?i)<\s*channel[\w\s="]*ref\s*=\s*"http\s?(server)?"(?-i)'; #match <channel ref="http server"
+        $subresult3 = $Content -match '(?i)<\s*channel[\w\s="]*port\s*=\s*"443"[\w\s="]*ref\s*=\s*"http\s?(server)?"(?-i)'; #match <channel port="443" ref="http server"
+        $subresult4 = $Content -match '(?i)<\s*channel[\w\s="]*ref\s*=\s*"http\s?(server)?"[\w\s="]*port\s*=\s*"443"(?-i)'; #match <channel ref="http server" port="443"
+
+        if ($subresult -and $subresult2 -and -not ($subresult3 -or $subresult4)) {
+            $found = $true;
+            $Results.Comments = "$($Results.Comments)`r`n" + $_.FullName
+        }
     }
 
 }
