@@ -17,9 +17,7 @@ function Start-STIGCheck {
         $STIG
     )
 
-    If ($PSBoundParameters['Debug']) {
-        $DebugPreference = 'Continue'
-    }
+    If ($PSBoundParameters['Debug']) { $DebugPreference = 'Continue' }
 
     # Start Metrics
     $StartTime = Get-Date
@@ -52,10 +50,9 @@ function Start-STIGCheck {
 
             # Lookup
             #TODO: Create function Grab predefined data points.
+            # Pull apart the fqdn to get the short domain name.
 
             # Update Checklist
-            Write-Verbose "[$($MyInvocation.MyCommand)] Updating $($($_.Name).split(".")[0]) Checklist - $($check.Status)"
-
             Set-VulnIDFinding -Checklist $CKL -VulnID $check.VulnID -RuleID $check.RuleID -Details $check.Details -Comments $check.Comments -Status $check.Status
 
         }
