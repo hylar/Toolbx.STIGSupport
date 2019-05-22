@@ -30,7 +30,7 @@ $FullFileList += $PreCheck.MachineConfigs
 
 $FullFileList | ForEach-Object {
 
-    Write-Verbose "[$($MyInvocation.MyCommand)] Searching $_"
+    Write-Debug "[$($MyInvocation.MyCommand)] Searching $_"
 
     # Match <enforceFIPSPolicy enabled="false"
     If((Get-Content $_ -ErrorAction SilentlyContinue) -match '(?i)<enforceFIPSPolicy[\w\s="]*enabled\s*=\s*"false"(?-i)'){

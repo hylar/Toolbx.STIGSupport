@@ -30,7 +30,7 @@ $FullFileList += $PreCheck.MachineConfigs
 
 $FullFileList | ForEach-Object {
 
-    Write-Verbose "[$($MyInvocation.MyCommand)] Searching $_"
+    Write-Debug "[$($MyInvocation.MyCommand)] Searching $_"
 
     $Content = (Get-Content $_ )
     $subresult = $Content -match '(?i)typefilterlevel\s*=\s*"full"(?-i)'; #match typefilterleve ="full"
