@@ -38,7 +38,8 @@ $FullFileList | ForEach-Object {
     Write-Debug "[$($MyInvocation.MyCommand)] Searching $_"
 
     # Match NetFx40_LegacySecurityPolicy enabled="true"
-    If((Get-Content $_ -ErrorAction SilentlyContinue) -match '(?i)NetFx40_LegacySecurityPolicy\s*enabled\s*=\s*"true"(?-i)'){
+    #TODO: Added better handling around when the file read gets access denied.
+    If((Get-Content $_ ) -match '(?i)NetFx40_LegacySecurityPolicy\s*enabled\s*=\s*"true"(?-i)'){
 
         If($Results.Comments -eq ""){
             $Results.Comments = "Files were found with legacy security enabled:`r`n"
