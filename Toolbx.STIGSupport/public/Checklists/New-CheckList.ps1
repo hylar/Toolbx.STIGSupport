@@ -43,6 +43,9 @@ Function New-CheckList {
     $xmlWriterSettings.NewLineChars = "`n"
     $writer = [System.Xml.XmlWriter]::Create($Destination, $xmlWriterSettings)
 
+
+    $writer.WriteComment("Created by Toolbx.STIGSupport ($((Get-Module Toolbx.STIGSupport).Version.ToString()))")
+
     $writer.WriteStartElement('CHECKLIST')
 
     $writer.WriteStartElement("ASSET")
