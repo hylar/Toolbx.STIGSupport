@@ -21,8 +21,9 @@ if($domain){
 
 # Pull secedit data to temp file
 Write-Verbose "[$($MyInvocation.MyCommand)] Pulling secedit.exe data."
-secedit.exe /export /areas SECURITYPOLICY /cfg c:\windows\temp\secEdit.txt
+secedit.exe /export /areas SECURITYPOLICY GROUP_MGMT USER_RIGHTS REGKEYS FILESTORE SERVICES /cfg c:\windows\temp\secEdit.txt
 $secEdit=Get-Content "c:\windows\temp\secEdit.txt"
+#$secEdit=Get-WmiObject -NameSpace Root\RSOP\Computer -Class RSOP_SecuritySettingBoolean | Select KeyName,status
 
 #Pull user rights
 $userRights=Get-WmiObject -NameSpace Root\RSOP\Computer -Class RSOP_UserPrivilegeRight | Select userright, Accountlist
@@ -53,5 +54,5 @@ return @{
     privUse     = $privUse
     system      = $system
     objAccess   = $objAccess
-    
+
 }
