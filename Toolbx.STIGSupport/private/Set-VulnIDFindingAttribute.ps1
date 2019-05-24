@@ -36,14 +36,14 @@ function Set-VulnIDFindingAttribute {
 
             $xObject = (Select-XML -Xml $Checklist -XPath "//STIG_DATA[VULN_ATTRIBUTE='Rule_ID' and ATTRIBUTE_DATA='$RuleID']").Node.ParentNode
 
-            $xObject | ForEach-Object { $_.$Attribute = "$Value" }
+            $xObject | ForEach-Object { $_.$Attribute = [System.Security.SecurityElement]::Escape($Value) }
 
         }
         else {
 
             $xObject = (Select-XML -Xml $Checklist -XPath "//STIG_DATA[VULN_ATTRIBUTE='Vuln_Num' and ATTRIBUTE_DATA='$VulnID']").Node.ParentNode
 
-            $xObject | ForEach-Object { $_.$Attribute = "$Value" }
+            $xObject | ForEach-Object { $_.$Attribute = [System.Security.SecurityElement]::Escape($Value) }
 
         }
 
