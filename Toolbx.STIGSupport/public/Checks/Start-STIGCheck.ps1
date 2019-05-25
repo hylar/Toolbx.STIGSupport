@@ -12,8 +12,9 @@ function Start-STIGCheck {
         # Select the STIG check to perform.
         [Parameter(Mandatory = $true)]
         [ValidateSet(
-            "Windows_Server_2016_V1R9",
-            "MS_DotNet_Framework_4-0"
+            "Windows_Server_2016",
+            "MS_DotNet_Framework_4-0",
+            "MS_IE11"
         )]
         $STIG
     )
