@@ -36,6 +36,8 @@ function Start-STIGCheck {
         $PreCheck = . "$PSScriptRoot\$STIG\pre.check.ps1"
     }
 
+    # View default findings and update checklist.
+
     # Run VulnID Checks
     $Checks = Get-ChildItem -Path $PSScriptRoot\$STIG -Filter "*.ps1" -File | Where-Object { $_.Name -ne "pre.check.ps1" -and $_.Name -ne "post.check.ps1" }
 
