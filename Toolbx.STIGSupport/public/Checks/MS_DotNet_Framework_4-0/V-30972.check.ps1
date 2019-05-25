@@ -42,12 +42,12 @@ $FullFileList | ForEach-Object {
 
             if($xml.configuration.'system.net'.defaultProxy.HasChildNodes -eq $false){
 
-                $Results.Comments = "[Not A Finding] $_"
+                $Results.Comments = "$($Results.Comments)`n" + "[Not A Finding] $_"
                 $Results.Comments = "$($Results.Comments)`n" + $xml.configuration.'system.net'.InnerXml.toString() + "`r`n"
 
             }else{
 
-                $Results.Comments = "[Finding] $_"
+                $Results.Comments = "$($Results.Comments)`n" + "[Finding] $_"
                 $Results.Comments = "$($Results.Comments)`n" + $xml.configuration.'system.net'.InnerXml.toString() + "`r`n"
                 $found = $true
 
@@ -55,7 +55,7 @@ $FullFileList | ForEach-Object {
 
         }else{
 
-            $Results.Comments = "[Finding] $_"
+            $Results.Comments = "$($Results.Comments)`n" + "[Finding] $_"
             $Results.Comments = "$($Results.Comments)`n" + $xml.configuration.'system.net'.InnerXml.toString() + "`r`n"
             $found = $true
 
