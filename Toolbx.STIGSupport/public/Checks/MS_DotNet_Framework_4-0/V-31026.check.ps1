@@ -2,7 +2,7 @@
 .SYNOPSIS
     This checks for compliancy on V-31026.
 
-    .NET default proxy settings must be reviewed and approved.
+    Event tracing for Windows (ETW) for Common Language Runtime events must be enabled.
 
 .PARAMETER PreCheck
     Input data as returned by the pre.check.ps1 script for this stig.

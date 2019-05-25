@@ -2,7 +2,7 @@
 .SYNOPSIS
     This checks for compliancy on V-7063.
 
-    The Trust Providers Software Publishing State must be set to 0x23C00.
+    Developer certificates used with the .NET Publisher Membership Condition must be approved by the IAO.
 
 .PARAMETER PreCheck
     Input data as returned by the pre.check.ps1 script for this stig.

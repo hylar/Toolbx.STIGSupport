@@ -2,7 +2,7 @@
 .SYNOPSIS
     This checks for compliancy on V-7067.
 
-    The Trust Providers Software Publishing State must be set to 0x23C00.
+    Encryption keys used for the .NET Strong Name Membership Condition must be protected.
 
 .PARAMETER PreCheck
     Input data as returned by the pre.check.ps1 script for this stig.
