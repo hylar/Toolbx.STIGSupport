@@ -30,7 +30,7 @@ $FullFileList += $PreCheck.MachineConfigs
 
 $FullFileList | ForEach-Object {
 
-    Write-Verbose "[$($MyInvocation.MyCommand)] Searching $_"
+    Write-Debug "[$($MyInvocation.MyCommand)] Searching $_"
 
     $content = (Get-Content $_ -ErrorAction SilentlyContinue)
 
