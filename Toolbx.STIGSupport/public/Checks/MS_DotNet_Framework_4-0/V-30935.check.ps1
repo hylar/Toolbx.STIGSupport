@@ -2,7 +2,7 @@
 .SYNOPSIS
     This checks for compliancy on V-30935.
 
-    The .NET CLR must be configured to use FIPS approved encryption modules.
+    .NET must be configured to validate strong names on full-trust assemblies.
 
 .PARAMETER PreCheck
     Input data as returned by the pre.check.ps1 script for this stig.
