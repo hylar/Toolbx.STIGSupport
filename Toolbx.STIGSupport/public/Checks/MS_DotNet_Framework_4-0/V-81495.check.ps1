@@ -2,7 +2,7 @@
 .SYNOPSIS
     This checks for compliancy on V-81495.
 
-    Trust must be established prior to enabling the loading of remote code in .Net 4.
+    Disable TLS RC4 cipher in .Net
 
 .PARAMETER PreCheck
     Input data as returned by the pre.check.ps1 script for this stig.

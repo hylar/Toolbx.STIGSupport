@@ -30,25 +30,23 @@ $FullFileList += $PreCheck.MachineConfigs
 
 $FullFileList | ForEach-Object {
 
-    if ((Get-Item -Path $_).Name -eq "caspol.exe.config") {
-        #Specifically exempted, so skip to next item in foreach loop
-        continue
-    }
+    if ((Get-Item -Path $_).Name -ne "caspol.exe.config") {
 
-    Write-Debug "[$($MyInvocation.MyCommand)] Searching $_"
+        Write-Debug "[$($MyInvocation.MyCommand)] Searching $_"
 
-    # Match NetFx40_LegacySecurityPolicy enabled="true"
-    #TODO: Added better handling around when the file read gets access denied.
-    If((Get-Content $_ ) -match '(?i)NetFx40_LegacySecurityPolicy\s*enabled\s*=\s*"true"(?-i)'){
+        # Match NetFx40_LegacySecurityPolicy enabled="true"
+        If((Get-Content $_ -ErrorAction SilentlyContinue ) -match '(?i)NetFx40_LegacySecurityPolicy\s*enabled\s*=\s*"true"(?-i)'){
 
-        If($Results.Comments -eq ""){
-            $Results.Comments = "Files were found with legacy security enabled:`r`n"
-            $Results.Comments = "$($Results.Comments)`r`n" + $_
-        }else{
-            $Results.Comments = "$($Results.Comments)`r`n" + $_
+            If($Results.Comments -eq ""){
+                $Results.Comments = "Files were found with legacy security enabled:`r`n"
+                $Results.Comments = "$($Results.Comments)`r`n" + $_
+            }else{
+                $Results.Comments = "$($Results.Comments)`r`n" + $_
+            }
+
+            $Found = $True
         }
 
-        $Found = $True
     }
 
 }

@@ -12,8 +12,9 @@ function Start-STIGCheck {
         # Select the STIG check to perform.
         [Parameter(Mandatory = $true)]
         [ValidateSet(
-            "Windows_Server_2016_V1R9",
-            "MS_DotNet_Framework_4-0"
+            "Windows_Server_2016",
+            "MS_DotNet_Framework_4-0",
+            "MS_IE11"
         )]
         $STIG
     )
@@ -35,6 +36,8 @@ function Start-STIGCheck {
         Write-Verbose "[$($MyInvocation.MyCommand)] Running $STIG Pre Check"
         $PreCheck = . "$PSScriptRoot\$STIG\pre.check.ps1"
     }
+
+    # View default findings and update checklist.
 
     # Run VulnID Checks
     $Checks = Get-ChildItem -Path $PSScriptRoot\$STIG -Filter "*.ps1" -File | Where-Object { $_.Name -ne "pre.check.ps1" -and $_.Name -ne "post.check.ps1" }
