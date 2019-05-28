@@ -20,6 +20,8 @@ Function Export-Checklist {
 
     $XMLWriter = [System.XML.XMLTextWriter]::Create($Path, $XMLSettings)
 
+    $Global:Test=$Checklist
+    $Checklist.InnerXml=$Checklist.InnerXml -replace "&#x0;","[0x00]"
     $Checklist.Save($XMLWriter)
     $XMLWriter.Flush()
     $XMLWriter.Dispose();
