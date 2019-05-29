@@ -33,7 +33,7 @@ if ($role.Installed -eq 1)  {
     $Results.Status = "Open"
     $Results.Details = "Fail. The $roleName role is installed. See comments."
 }
-$Results.Comments = $role
+$Results.Comments = $role | Out-String
 
 
 Write-Verbose "[$($MyInvocation.MyCommand)] Completed Checking - V-73287 [$($Results.Status)]"
