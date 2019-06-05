@@ -1,4 +1,4 @@
-Function New-CheckList {
+Function ConvertTo-Checklist {
 
     [CmdletBinding()]
     [OutputType([xml])]
