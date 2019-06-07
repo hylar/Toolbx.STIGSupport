@@ -16,19 +16,19 @@ function New-Checklist {
         # Will Create Server 2012 R2 Member OS, .Net Framework 4, and IE11 Checklists.
         [Parameter()]
         [Switch]
-        $2012R2MSCore,
+        $Win2012R2MSCore,
 
         # Will Create Server 2012 R2 Domain Controller OS, .Net Framework 4, and IE11 Checklists.
         [Parameter()]
         [Switch]
-        $2012R2DCCore,
+        $Win2012R2DCCore,
 
         # Will Create Server 2016 OS, .Net Framework 4, and IE11 Checklists.
         [Parameter()]
         [Switch]
-        $2016Core,
+        $Win2016Core,
 
-        # Will Create Windows 10 OS, .Net Framework 4, and IE11, Adobe Reader Continous, Chrome, Firefox, and Java Checklists
+        # Will Create Windows 10 OS, .Net Framework 4, and IE11, Adobe Reader Continous, Chrome, Firefox, and Java 8 Checklists
         [Parameter()]
         [Switch]
         $Win10Core
@@ -52,9 +52,8 @@ function New-Checklist {
     process {
 
         [array]$cklCreated = @()
-        $templates = Get-ChildItem $("$PSScriptRoot\..\..\tools\STIG Data\Current")
 
-        $templates
+        $templates = Get-ChildItem $("$PSScriptRoot\..\..\tools\STIG Data\Current")
 
         If ($(Test-Path -Path $Destination) -eq $false) {
             New-Item -Path $Destination -ItemType Directory -Force | out-null
@@ -77,25 +76,47 @@ function New-Checklist {
             Write-Verbose "[$($MyInvocation.MyCommand)] Created $xccdfNewPath"
         }
 
-        if ($Win10Core) {
-            $core = @{
-                "Win10" = $($templates | Where-Object { $_.Name -like "U_MS_Windows_10_STIG_*" }).fullname
-                #TODO: There needs to be a better way to do this.
-                "Win10Path" = "$Destination\$($HostName)_$($($($templates | Where-Object { $_.Name -like "U_MS_Windows_10_STIG_*" }).Name).Replace("_Manual-xccdf.xml",".xml"))"
-                "IE11"    = $($templates | Where-Object { $_.Name -like "U_MS_IE11_STIG_*" }).fullname
-                "IE11Path" = "$Destination\$($HostName)_$($($(split-path $core.IE11 -leaf)).Replace("_Manual-xccdf.xml",".xml"))"
-            }
+        [Hashtable]$core = @{ }
 
-            #Write-Verbose "[$($MyInvocation.MyCommand)] Creating New Checklist from $(split-path $core.Win10 -leaf)"
+        If ($Win10Core) { $core.Add("WIN10", $($templates | Where-Object { $_.Name -like "U_MS_Windows_10_STIG_*" }).fullname) }
 
-            #$cklCreated += $core.Win10Path
-            #ConvertTo-Checklist -XccdfPath $core.Win10 -Destination $core.Win10Path
-            #Write-Verbose "[$($MyInvocation.MyCommand)] Created $($core.Win10Path)"
-
-            $core
+        If ($Win10Core -or $Win2012R2MSCore -or $Win2012R2DCCore -or $Win2016Core) {
+            $core.Add("IE11", $($templates | Where-Object { $_.Name -like "U_MS_IE11_STIG_*" }).fullname)
         }
 
-        #$cklCreated
+        If ($Win10Core) { $core.Add("Chrome", $($templates | Where-Object { $_.Name -like "U_Google_Chrome_STIG_*" }).fullname) }
+
+        If ($Win10Core) { $core.Add("ARC", $($templates | Where-Object { $_.Name -like "U_Adobe_Acrobat_Reader_DC_Continuous_*" }).fullname) }
+
+        If ($Win10Core -or $Win2012R2MSCore -or $Win2012R2DCCore -or $Win2016Core) {
+            $core.Add("DNF", $($templates | Where-Object { $_.Name -like "U_MS_DotNet_Framework_4-0_STIG_*" }).fullname)
+        }
+
+        If ($Win10Core) { $core.Add("FF", $($templates | Where-Object { $_.Name -like "U_Mozilla_FireFox_STIG_*" }).fullname) }
+
+        If ($Win10Core) { $core.Add("JRE8", $($templates | Where-Object { $_.Name -like "U_Oracle_JRE_8_Windows_STIG_*" }).fullname) }
+
+        If ($Win2012R2MSCore) { $core.Add("2k12MS", $($templates | Where-Object { $_.Name -like "U_MS_Windows_2012_and_2012_R2_MS_STIG_*" }).fullname) }
+
+        If ($Win2012R2DCCore) { $core.Add("2k12DC", $($templates | Where-Object { $_.Name -like "U_MS_Windows_2012_and_2012_R2_DC_STIG_*" }).fullname) }
+
+        If ($Win2016Core) { $core.Add("2k16", $($templates | Where-Object { $_.Name -like "U_MS_Windows_Server_2016_STIG_*" }).fullname) }
+
+        # Create Checklists
+        foreach ($key in $core.keys) {
+
+            Write-Verbose "[$($MyInvocation.MyCommand)] Creating New Checklist from $(split-path $core[$key] -leaf)"
+
+            $saveTo = "$Destination\$($HostName)_$($($(split-path $core[$key] -leaf)).Replace("_Manual-xccdf.xml",".xml"))"
+
+            ConvertTo-Checklist -XccdfPath $core[$key] -Destination $saveTo -HostName $HostName
+
+            $cklCreated += $saveTo
+
+            Write-Verbose "[$($MyInvocation.MyCommand)] Created $saveTo"
+        }
+
+        $cklCreated
     }
 
 }
