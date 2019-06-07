@@ -31,7 +31,27 @@ function New-Checklist {
         # Will Create Windows 10 OS, .Net Framework 4, and IE11, Adobe Reader Continous, Chrome, Firefox, and Java 8 Checklists
         [Parameter()]
         [Switch]
-        $Win10Core
+        $Win10Core,
+
+        # Will Create Adobe Reader Continous Checklist.
+        [Parameter()]
+        [Switch]
+        $AdobeReaderDC,
+
+        # Will Create Win JRE Checklist.
+        [Parameter()]
+        [Switch]
+        $WinJRE,
+
+        # Will Create Unix JRE Checklist.
+        [Parameter()]
+        [Switch]
+        $UnixJRE,
+
+        # Will Create RedHat 6.
+        [Parameter()]
+        [Switch]
+        $Office2010
     )
 
     DynamicParam {
@@ -86,7 +106,7 @@ function New-Checklist {
 
         If ($Win10Core) { $core.Add("Chrome", $($templates | Where-Object { $_.Name -like "U_Google_Chrome_STIG_*" }).fullname) }
 
-        If ($Win10Core) { $core.Add("ARC", $($templates | Where-Object { $_.Name -like "U_Adobe_Acrobat_Reader_DC_Continuous_*" }).fullname) }
+        If ($Win10Core -or $AdobeReaderDC) { $core.Add("ARC", $($templates | Where-Object { $_.Name -like "U_Adobe_Acrobat_Reader_DC_Continuous_*" }).fullname) }
 
         If ($Win10Core -or $Win2012R2MSCore -or $Win2012R2DCCore -or $Win2016Core) {
             $core.Add("DNF", $($templates | Where-Object { $_.Name -like "U_MS_DotNet_Framework_4-0_STIG_*" }).fullname)
@@ -94,13 +114,19 @@ function New-Checklist {
 
         If ($Win10Core) { $core.Add("FF", $($templates | Where-Object { $_.Name -like "U_Mozilla_FireFox_STIG_*" }).fullname) }
 
-        If ($Win10Core) { $core.Add("JRE8", $($templates | Where-Object { $_.Name -like "U_Oracle_JRE_8_Windows_STIG_*" }).fullname) }
+        If ($Win10Core -or $WinJRE) { $core.Add("WinJRE8", $($templates | Where-Object { $_.Name -like "U_Oracle_JRE_8_Windows_STIG_*" }).fullname) }
+
+        If ($UnixJRE) { $core.Add("UnixJRE8", $($templates | Where-Object { $_.Name -like "U_Oracle_JRE_8_UNIX_*" }).fullname) }
 
         If ($Win2012R2MSCore) { $core.Add("2k12MS", $($templates | Where-Object { $_.Name -like "U_MS_Windows_2012_and_2012_R2_MS_STIG_*" }).fullname) }
 
         If ($Win2012R2DCCore) { $core.Add("2k12DC", $($templates | Where-Object { $_.Name -like "U_MS_Windows_2012_and_2012_R2_DC_STIG_*" }).fullname) }
 
         If ($Win2016Core) { $core.Add("2k16", $($templates | Where-Object { $_.Name -like "U_MS_Windows_Server_2016_STIG_*" }).fullname) }
+
+        If ($REHL6) { $core.Add("REHL6", $($templates | Where-Object { $_.Name -like "U_RedHat_6_*" }).fullname) }
+
+        If ($REHL7) { $core.Add("REHL7", $($templates | Where-Object { $_.Name -like "U_Red_Hat_Enterprise_Linux_7_*" }).fullname) }
 
         # Create Checklists
         foreach ($key in $core.keys) {
