@@ -158,6 +158,7 @@ function New-Checklist {
 
         }
 
+        $cklCreated
     }
 
 }
