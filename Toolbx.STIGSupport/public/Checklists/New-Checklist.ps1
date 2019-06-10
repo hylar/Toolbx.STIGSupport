@@ -1,4 +1,30 @@
+
 function New-Checklist {
+
+    <#
+        .SYNOPSIS
+            Creates new STIG Checklists.
+
+        .DESCRIPTION
+            Creates new STIG Checklist from a predefined set within the module. This function also allows users to create STIG Sets so mutltiple STIG Checklists can be created at the same time. If you need to create a STIG Checklist from a template that is not in this module, use the ConvertTo-Checklist function.
+
+        .PARAMETER ChecklistSet
+            Specify a checklist set that will be used to create STIG Checklists for the given host.
+
+        .PARAMETER XCCDFTemplates
+            Specify a XCCDF Template to be used to create a new STIG Checklist. The list of templates are maintained within the module and get updated when new STIG checklists are releasesed.
+
+        .EXAMPLE
+            PS C:\> New-Checklist -Destination C:\Temp\Checklists -ChecklistSet 'Windows 10 - Core'
+
+            This examples shows the function being called to create a set of checklists that are apart of 'Windows 10 - Core'.
+
+        .OUTPUTS
+            fullpaths to checklists that where created. [String[]]
+
+        .NOTES
+            None
+    #>
 
     [CmdletBinding()]
     param (
@@ -11,51 +37,14 @@ function New-Checklist {
         # Specify the HostName for the new checklist(s). If no name is provided, the local computername will be used.
         [Parameter()]
         [string]
-        $HostName = $ENV:COMPUTERNAME,
-
-        # Will Create Server 2012 R2 Member OS, .Net Framework 4, and IE11 Checklists.
-        [Parameter()]
-        [Switch]
-        $Win2012R2MSCore,
-
-        # Will Create Server 2012 R2 Domain Controller OS, .Net Framework 4, and IE11 Checklists.
-        [Parameter()]
-        [Switch]
-        $Win2012R2DCCore,
-
-        # Will Create Server 2016 OS, .Net Framework 4, and IE11 Checklists.
-        [Parameter()]
-        [Switch]
-        $Win2016Core,
-
-        # Will Create Windows 10 OS, .Net Framework 4, and IE11, Adobe Reader Continous, Chrome, Firefox, and Java 8 Checklists
-        [Parameter()]
-        [Switch]
-        $Win10Core,
-
-        # Will Create Adobe Reader Continous Checklist.
-        [Parameter()]
-        [Switch]
-        $AdobeReaderDC,
-
-        # Will Create Win JRE Checklist.
-        [Parameter()]
-        [Switch]
-        $WinJRE,
-
-        # Will Create Unix JRE Checklist.
-        [Parameter()]
-        [Switch]
-        $UnixJRE,
-
-        # Will Create RedHat 6.
-        [Parameter()]
-        [Switch]
-        $Office2010
+        $HostName = $ENV:COMPUTERNAME
     )
 
     DynamicParam {
+
+        #Create Parameter Dictionary
         $RuntimeParamDic = New-Object System.Management.Automation.RuntimeDefinedParameterDictionary
+
         $AttribColl = New-Object System.Collections.ObjectModel.Collection[System.Attribute]
         $ParamAttrib = New-Object System.Management.Automation.ParameterAttribute
         $ParamAttrib.Mandatory = $Mandatory.IsPresent
@@ -63,9 +52,21 @@ function New-Checklist {
         $ParamAttrib.ValueFromPipeline = $ValueFromPipeline.IsPresent
         $ParamAttrib.ValueFromPipelineByPropertyName = $ValueFromPipelineByPropertyName.IsPresent
         $AttribColl.Add($ParamAttrib)
-        $AttribColl.Add((New-Object System.Management.Automation.ValidateSetAttribute((Get-ChildItem $("$PSScriptRoot\..\..\tools\STIG Data\Current") -File | Select-Object -ExpandProperty Name))))
-        $RuntimeParam = New-Object System.Management.Automation.RuntimeDefinedParameter('XCCDFTemplates', [string], $AttribColl)
-        $RuntimeParamDic.Add('XCCDFTemplates', $RuntimeParam)
+        $AttribColl.Add( ( New-Object System.Management.Automation.ValidateSetAttribute($($($(Get-Content -Raw -Path "$PSScriptRoot\..\..\Toolbx.STIGSupport.config" | ConvertFrom-Json).NewCheckListOptions.Name) + $(if ($(Test-Path "$env:USERPROFILE\Documents\WindowsPowerShell\Toolbx.STIGSupport.config") -eq $true) { $(Get-Content -Raw -Path "$env:USERPROFILE\Documents\WindowsPowerShell\Toolbx.STIGSupport.config" | ConvertFrom-Json).NewCheckListOptions.Name })))))
+        $RuntimeParam = New-Object System.Management.Automation.RuntimeDefinedParameter('ChecklistSet', [string], $AttribColl)
+        $RuntimeParamDic.Add('ChecklistSet', $RuntimeParam)
+
+        $AttribColl1 = New-Object System.Collections.ObjectModel.Collection[System.Attribute]
+        $ParamAttrib1 = New-Object System.Management.Automation.ParameterAttribute
+        $ParamAttrib1.Mandatory = $Mandatory.IsPresent
+        $ParamAttrib1.ParameterSetName = '__AllParameterSets'
+        $ParamAttrib1.ValueFromPipeline = $ValueFromPipeline.IsPresent
+        $ParamAttrib1.ValueFromPipelineByPropertyName = $ValueFromPipelineByPropertyName.IsPresent
+        $AttribColl1.Add($ParamAttrib1)
+        $AttribColl1.Add((New-Object System.Management.Automation.ValidateSetAttribute((Get-ChildItem $("$PSScriptRoot\..\..\tools\STIG Data\Current") -File | Select-Object -ExpandProperty Name))))
+        $RuntimeParam1 = New-Object System.Management.Automation.RuntimeDefinedParameter('XCCDFTemplates', [string], $AttribColl1)
+        $RuntimeParamDic.Add('XCCDFTemplates', $RuntimeParam1)
+
         return $RuntimeParamDic
     }
 
@@ -82,64 +83,79 @@ function New-Checklist {
         # Check is a specific checklist was selected. If so Create that checklist.
         if ($PSBoundParameters.XCCDFTemplates) {
 
-            Write-Verbose "[$($MyInvocation.MyCommand)] Creating New Checklist from $($PSBoundParameters.XCCDFTemplates)"
+            try {
+                Write-Verbose "[$($MyInvocation.MyCommand)] Creating New Checklist from $($PSBoundParameters.XCCDFTemplates)"
 
-            $xccdfTempPath = "$PSScriptRoot\..\..\tools\STIG Data\Current\" + $PSBoundParameters.XCCDFTemplates
+                $xccdfTempPath = "$PSScriptRoot\..\..\tools\STIG Data\Current\" + $PSBoundParameters.XCCDFTemplates
 
 
-            $xccdfNewPath = "$Destination\$($HostName)_$($($PSBoundParameters.XCCDFTemplates).Replace("_Manual-xccdf.xml",".xml"))"
-            Write-Verbose "[$($MyInvocation.MyCommand)] Saving to $xccdfNewPath"
+                $xccdfNewPath = "$Destination\$($HostName)_$($($PSBoundParameters.XCCDFTemplates).Replace("_Manual-xccdf.xml",".xml"))"
+                Write-Verbose "[$($MyInvocation.MyCommand)] Saving to $xccdfNewPath"
 
-            $cklCreated += $xccdfNewPath
+                $cklCreated += $xccdfNewPath
 
-            ConvertTo-Checklist -XccdfPath $xccdfTempPath -Destination $xccdfNewPath
-            Write-Verbose "[$($MyInvocation.MyCommand)] Created $xccdfNewPath"
+                ConvertTo-Checklist -XccdfPath $xccdfTempPath -Destination $xccdfNewPath
+                Write-Verbose "[$($MyInvocation.MyCommand)] Created $xccdfNewPath"
+            }
+            catch {
+
+                Write-Error $_
+
+            }
+
         }
 
-        [Hashtable]$core = @{ }
+        # Retrieve Custom Set if provided and create checklists.
+        if ($PSBoundParameters.ChecklistSet) {
 
-        If ($Win10Core) { $core.Add("WIN10", $($templates | Where-Object { $_.Name -like "U_MS_Windows_10_STIG_*" }).fullname) }
+            Write-Verbose "[$($MyInvocation.MyCommand)] Creating New Checklist from $($PSBoundParameters.ChecklistSet) Set"
 
-        If ($Win10Core -or $Win2012R2MSCore -or $Win2012R2DCCore -or $Win2016Core) {
-            $core.Add("IE11", $($templates | Where-Object { $_.Name -like "U_MS_IE11_STIG_*" }).fullname)
-        }
+            #Declare Config Files with Sets
+            $configs = @()
 
-        If ($Win10Core) { $core.Add("Chrome", $($templates | Where-Object { $_.Name -like "U_Google_Chrome_STIG_*" }).fullname) }
+            $configs += $(Get-Content -Raw -Path "$PSScriptRoot\..\..\Toolbx.STIGSupport.config" | ConvertFrom-Json)
 
-        If ($Win10Core -or $AdobeReaderDC) { $core.Add("ARC", $($templates | Where-Object { $_.Name -like "U_Adobe_Acrobat_Reader_DC_Continuous_*" }).fullname) }
+            if ($(Test-Path "$env:USERPROFILE\Documents\WindowsPowerShell\Toolbx.STIGSupport.config") -eq $true -eq $true) {
+                $configs += $(Get-Content -Raw -Path "$env:USERPROFILE\Documents\WindowsPowerShell\Toolbx.STIGSupport.config" | ConvertFrom-Json)
+            }
 
-        If ($Win10Core -or $Win2012R2MSCore -or $Win2012R2DCCore -or $Win2016Core) {
-            $core.Add("DNF", $($templates | Where-Object { $_.Name -like "U_MS_DotNet_Framework_4-0_STIG_*" }).fullname)
-        }
+            foreach ($c in $configs) {
 
-        If ($Win10Core) { $core.Add("FF", $($templates | Where-Object { $_.Name -like "U_Mozilla_FireFox_STIG_*" }).fullname) }
+                foreach ($o in $c.NewCheckListOptions) {
 
-        If ($Win10Core -or $WinJRE) { $core.Add("WinJRE8", $($templates | Where-Object { $_.Name -like "U_Oracle_JRE_8_Windows_STIG_*" }).fullname) }
+                    if ($o.Name -eq $PSBoundParameters.ChecklistSet) {
 
-        If ($UnixJRE) { $core.Add("UnixJRE8", $($templates | Where-Object { $_.Name -like "U_Oracle_JRE_8_UNIX_*" }).fullname) }
+                        foreach ($ckl in $o.ckl) {
 
-        If ($Win2012R2MSCore) { $core.Add("2k12MS", $($templates | Where-Object { $_.Name -like "U_MS_Windows_2012_and_2012_R2_MS_STIG_*" }).fullname) }
+                            Write-Verbose "[$($MyInvocation.MyCommand)] Creating New Checklist $ckl"
 
-        If ($Win2012R2DCCore) { $core.Add("2k12DC", $($templates | Where-Object { $_.Name -like "U_MS_Windows_2012_and_2012_R2_DC_STIG_*" }).fullname) }
+                            try {
 
-        If ($Win2016Core) { $core.Add("2k16", $($templates | Where-Object { $_.Name -like "U_MS_Windows_Server_2016_STIG_*" }).fullname) }
+                                $checklist = $($templates | Where-Object { $_.Name -like "$ckl*" })
+                                $xccdfNewPath = "$Destination\$($HostName)_$($($checklist.name).Replace("_Manual-xccdf.xml",".xml"))"
 
-        If ($REHL6) { $core.Add("REHL6", $($templates | Where-Object { $_.Name -like "U_RedHat_6_*" }).fullname) }
+                                Write-Debug "[$($MyInvocation.MyCommand)] Xccdf: $($checklist.fullname)"
+                                Write-Debug "[$($MyInvocation.MyCommand)] SaveTo: $xccdfNewPath"
+                                ConvertTo-Checklist -XccdfPath $checklist.fullname -Destination $xccdfNewPath
 
-        If ($REHL7) { $core.Add("REHL7", $($templates | Where-Object { $_.Name -like "U_Red_Hat_Enterprise_Linux_7_*" }).fullname) }
+                                Write-Verbose "[$($MyInvocation.MyCommand)] Created $xccdfNewPath"
+                                $cklCreated += $xccdfNewPath
 
-        # Create Checklists
-        foreach ($key in $core.keys) {
+                            }
+                            catch {
 
-            Write-Verbose "[$($MyInvocation.MyCommand)] Creating New Checklist from $(split-path $core[$key] -leaf)"
+                                Write-Error $_
 
-            $saveTo = "$Destination\$($HostName)_$($($(split-path $core[$key] -leaf)).Replace("_Manual-xccdf.xml",".xml"))"
+                            }
 
-            ConvertTo-Checklist -XccdfPath $core[$key] -Destination $saveTo -HostName $HostName
+                        }
 
-            $cklCreated += $saveTo
+                    }
 
-            Write-Verbose "[$($MyInvocation.MyCommand)] Created $saveTo"
+                }
+
+            }
+
         }
 
         $cklCreated
