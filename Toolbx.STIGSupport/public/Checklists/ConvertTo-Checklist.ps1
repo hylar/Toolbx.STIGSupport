@@ -1,39 +1,63 @@
 Function ConvertTo-Checklist {
 
+    <#
+        .SYNOPSIS
+            Creates new STIG Checklists from DISA XCCDF file.
+
+        .DESCRIPTION
+            Creates new STIG Checklists from DISA XCCDF file.
+
+        .EXAMPLE
+            PS C:\> ConvertTo-Checklist -XccdfPath 'C:\Temp\U_Adobe_Acrobat_Reader_DC_Continuous_V1R5_Manual-xccdf.xml -Destination C:\Temp\U_Adobe_Acrobat_Reader_DC_Continuous_.ckl
+
+            This examples shows the function created an adobe reader checklist in C:\Temp.
+
+        .OUTPUTS
+            None
+
+        .NOTES
+            None
+    #>
+
     [CmdletBinding()]
     [OutputType([xml])]
     param(
 
+        # Specify the path to the DISA XCCDF file.
         [Parameter(Mandatory = $true)]
         [string]
         $XccdfPath,
 
+        # Specify the path to save the new checklist (.ckl) file.
         [Parameter(Mandatory = $true)]
         [string]
         $Destination,
 
+        # Specify the host name for the checklist.
         [Parameter()]
         [string]
         $HostName,
 
+        # Specify the Host IP Address for the checklist.
         [Parameter()]
         [string]
         $HostIP,
 
+        # Specify the Host GUID for the checklist.
         [Parameter()]
         [string]
         $HostGUID,
 
+        # Specify the Host MAC Address for the checklist.
         [Parameter()]
         [string]
         $HostMAC,
 
+        # Specify the Host FQDN for the checklist.
         [Parameter()]
         [string]
         $HostFQDN
     )
-
-    #TODO: Create a Dynamic Parameter to create a list of names from the Active folder under STIGData.
 
     $xccdfBenchmarkContent = Import-XccdfBenchmarkContent -Path $XccdfPath
 
