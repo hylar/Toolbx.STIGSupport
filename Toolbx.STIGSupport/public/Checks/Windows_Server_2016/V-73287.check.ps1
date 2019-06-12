@@ -27,11 +27,11 @@ $roleName = "Fax Server"
 $role = Get-WindowsFeature | ? {$_.DisplayName -eq $roleName}
 if ($role.Installed -eq 0) {
     $Results.Status = "NotAFinding"
-    $Results.Details = "The $roleName role is not installed. See comments."
+    $Results.Details = "The $roleName role is not installed. See comments for details."
 }
 if ($role.Installed -eq 1)  {
     $Results.Status = "Open"
-    $Results.Details = "Fail. The $roleName role is installed. See comments."
+    $Results.Details = "Fail. The $roleName role is installed. See comments for details."
 }
 $Results.Comments = $role | Out-String
 
