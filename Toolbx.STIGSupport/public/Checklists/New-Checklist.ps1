@@ -89,7 +89,7 @@ function New-Checklist {
                 $xccdfTempPath = "$PSScriptRoot\..\..\tools\STIG Data\Current\" + $PSBoundParameters.XCCDFTemplates
 
 
-                $xccdfNewPath = "$Destination\$($HostName)_$($($PSBoundParameters.XCCDFTemplates).Replace("_Manual-xccdf.xml",".xml"))"
+                $xccdfNewPath = "$Destination\$($HostName)_$($($PSBoundParameters.XCCDFTemplates).Replace("_Manual-xccdf.xml",".ckl"))"
                 Write-Verbose "[$($MyInvocation.MyCommand)] Saving to $xccdfNewPath"
 
                 $cklCreated += $xccdfNewPath
@@ -132,7 +132,7 @@ function New-Checklist {
                             try {
 
                                 $checklist = $($templates | Where-Object { $_.Name -like "$ckl*" })
-                                $xccdfNewPath = "$Destination\$($HostName)_$($($checklist.name).Replace("_Manual-xccdf.xml",".xml"))"
+                                $xccdfNewPath = "$Destination\$($HostName)_$($($checklist.name).Replace("_Manual-xccdf.xml",".ckl"))"
 
                                 Write-Debug "[$($MyInvocation.MyCommand)] Xccdf: $($checklist.fullname)"
                                 Write-Debug "[$($MyInvocation.MyCommand)] SaveTo: $xccdfNewPath"
