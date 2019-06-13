@@ -7,7 +7,7 @@ function Set-VulnIDFindingAttribute {
         [XML]
         $Checklist,
 
-        [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
+        [Parameter(ValueFromPipeline = $true)]
         [String]
         $VulnID,
 

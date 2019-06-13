@@ -9,7 +9,7 @@ Function Set-VulnIDFinding
         $Checklist,
 
         # Specify the STIG VulnID
-        [Parameter(Mandatory=$true, ValueFromPipeline = $true)]
+        [Parameter(ValueFromPipeline = $true)]
         [String]
         $VulnID,
 
@@ -34,9 +34,9 @@ Function Set-VulnIDFinding
         $Status
     )
 
-    If ($PSBoundParameters.ContainsKey('RuleID') -and $RuleID -ne '') {
+    If ($PSBoundParameters.ContainsKey('RuleID') -and $RuleID -ne '' -and $PSBoundParameters.ContainsKey('VulnID') -and $VulnID -ne '') {
 
-        Write-Verbose "[Set-VulnIDFinding] Entered RuleID Check '$RuleID'"
+        Write-Verbose "[Set-VulnIDFinding] Entered RuleID/VulnID Check '$RuleID'"
         Set-VulnIDFindingAttribute -Checklist $Checklist -RuleID $RuleID -VulnID $VulnID -Attribute "STATUS"  -Value $Status
 
         # Update Details if passed.
@@ -47,6 +47,22 @@ Function Set-VulnIDFinding
         # Update Comments if passed.
         If($PSBoundParameters.ContainsKey('Comments')){
             Set-VulnIDFindingAttribute -Checklist $Checklist -RuleID $RuleID -VulnID $VulnID -Attribute "COMMENTS"  -Value "$Comments"
+        }
+
+    }
+    elseif ($PSBoundParameters.ContainsKey('RuleID') -and $RuleID -ne '') {
+
+        Write-Verbose "[Set-VulnIDFinding] Entered RuleID Check '$RuleID'"
+        Set-VulnIDFindingAttribute -Checklist $Checklist -RuleID $RuleID -Attribute "STATUS"  -Value $Status
+
+        # Update Details if passed.
+        If($PSBoundParameters.ContainsKey('Details')){
+            Set-VulnIDFindingAttribute -Checklist $Checklist -RuleID $RuleID -Attribute "FINDING_DETAILS"  -Value "$Details"
+        }
+
+        # Update Comments if passed.
+        If($PSBoundParameters.ContainsKey('Comments')){
+            Set-VulnIDFindingAttribute -Checklist $Checklist -RuleID $RuleID -Attribute "COMMENTS"  -Value "$Comments"
         }
 
     }
