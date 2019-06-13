@@ -27,6 +27,6 @@ Function Import-Checklist {
         $Path
     )
 
-    return [XML](Get-Content -Path $Path)
+    return [XML](Get-Content -Encoding UTF8 -Path $Path)
 
 }
