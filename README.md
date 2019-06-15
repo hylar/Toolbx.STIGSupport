@@ -6,6 +6,7 @@ This powershell module was created to support system administrators with DISA ST
 Import-Module "<PathtoModuleFolder>\Toolbx.STIGSupport"
 ```
 
-
+## Notes
+This module was created to help with a specific set of checklists and scap benchmarks. If there is another set of checks you would like to see please open defect and we can work on getting it added.
 
 
