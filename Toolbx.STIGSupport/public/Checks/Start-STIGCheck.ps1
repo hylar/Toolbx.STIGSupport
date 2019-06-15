@@ -57,7 +57,7 @@ function Start-STIGCheck {
             # Pull apart the fqdn to get the short domain name.
 
             # Update Checklist
-            Set-ChecklistItem -Checklist $CKL -VulnID $check.VulnID -RuleID $check.RuleID -Details $check.Details -Comments $check.Comments -Status $check.Status
+            Set-ChecklistItem -Checklist $CKL @check
 
         }
         Catch {

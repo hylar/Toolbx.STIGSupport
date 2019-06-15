@@ -14,6 +14,7 @@ Write-Verbose "Checking - V-####"
 # Initial Variables
 $Results = @{
     VulnID   = "V-####"
+    RuleID   = ""
     Details  = ""
     Comments = ""
     Status   = ""

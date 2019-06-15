@@ -28,7 +28,7 @@ Function Set-ChecklistItem
         [String]
         $Comments,
 
-        [Parameter(Mandatory=$true, ValueFromPipeline = $true)]
+        [Parameter(ValueFromPipeline = $true)]
         [ValidateSet("Open","NotAFinding","Not_Reviewed","Not_Applicable")]
         [String]
         $Status
