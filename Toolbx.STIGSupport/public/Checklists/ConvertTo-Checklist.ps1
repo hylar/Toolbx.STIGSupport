@@ -25,6 +25,7 @@ Function ConvertTo-Checklist {
 
         # Specify the path to the DISA XCCDF file.
         [Parameter(Mandatory = $true)]
+        [ValidateScript( {Test-Path -Path $_})]
         [string]
         $XccdfPath,
 
@@ -59,7 +60,7 @@ Function ConvertTo-Checklist {
         $HostFQDN
     )
 
-    $xccdfBenchmarkContent = Import-XccdfBenchmarkContent -Path $XccdfPath
+    $xccdfBenchmarkContent = [XML](Get-Content -Encoding UTF8 -Path $XccdfPath)
 
     $xmlWriterSettings = [System.Xml.XmlWriterSettings]::new()
     $xmlWriterSettings.Indent = $true
