@@ -24,7 +24,7 @@ $Results = @{
 
 #Perform necessary check
 $roleName = "Fax Server"
-$role = Get-WindowsFeature | ? {$_.DisplayName -eq $roleName}
+$role = Get-WindowsFeature | Where-Object {$_.DisplayName -eq $roleName}
 if ($role.Installed -eq 0) {
     $Results.Status = "NotAFinding"
     $Results.Details = "The $roleName role is not installed. See comments for details."
