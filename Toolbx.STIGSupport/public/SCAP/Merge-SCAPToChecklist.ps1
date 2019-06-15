@@ -38,12 +38,12 @@ function Merge-SCAPToChecklist {
         if ($_.result -eq "pass") {
 
             # Update Checklist
-            Set-VulnIDFinding -Checklist $checklist -RuleID $_.RuleID -Details $PassedFinding -Status "NotAFinding"
+            Set-ChecklistItem -Checklist $checklist -RuleID $_.RuleID -Details $PassedFinding -Status "NotAFinding"
         }
         else {
 
             # Update Checklist
-            Set-VulnIDFinding -Checklist $checklist -RuleID $_.RuleID -Details $FailedFinding -Status "Open"
+            Set-ChecklistItem -Checklist $checklist -RuleID $_.RuleID -Details $FailedFinding -Status "Open"
 
         }
 
