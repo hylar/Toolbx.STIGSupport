@@ -1,5 +1,29 @@
 
-function Set-VulnIDFindingAttribute {
+function Set-FindingAttribute {
+
+    <#
+        .SYNOPSIS
+            Set specific Attributes for STIG Check.
+
+        .DESCRIPTION
+            This is a private function to help with setting STIG check attributes.
+
+        .EXAMPLE
+            PS C:\> Set-FindingAttribute -Checklist $Ckl -VulnID "V-46481" -Attribute "STATUS" -Value "Open"
+
+            This example shows to set an attribute based on the VulnID.
+
+        .EXAMPLE
+            PS C:\> Set-FindingAttribute -Checklist $Ckl -RuleID "SV-59345r1_rule" -Attribute "STATUS" -Value "Not_Reviewed"
+
+            This example shows how to set an attribute based on the RuleID.
+
+        .OUTPUTS
+            None
+
+        .NOTES
+            None
+    #>
 
     Param(
 
