@@ -36,7 +36,7 @@ Function Set-ChecklistItem
 
     if ($PSBoundParameters.ContainsKey('RuleID') -and $RuleID -ne '') {
 
-        Write-Verbose "[Set-VulnIDFinding] Entered RuleID Check '$RuleID'"
+        Write-Verbose "[$($MyInvocation.MyCommand)] Entered RuleID Check '$RuleID'"
 
         Set-FindingAttribute -Checklist $Checklist -RuleID $RuleID -Attribute "STATUS"  -Value $Status
 

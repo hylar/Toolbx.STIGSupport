@@ -9,14 +9,32 @@ function Start-STIGCheck {
         [ValidateScript( { Test-Path -Path $_ })]
         $Checklist,
 
+        # Specify the path to the SCAP Benchmark to import.
+        [Parameter()]
+        [ValidateScript( { Test-Path -Path $_ })]
+        $SCAPBenchmark,
+
         # Select the STIG check to perform.
         [Parameter(Mandatory = $true)]
         [ValidateSet(
-            "Windows_Server_2016",
             "MS_DotNet_Framework_4-0",
-            "MS_IE11"
+            "MS_IE11",
+            "Windows_Server_2012_DC",
+            "Windows_Server_2012_MS",
+            "Windows_Server_2016",
+            "Windows_10"
         )]
-        $STIG
+        $STIG,
+
+        # Specify the Default Findings Result for checks that passed.
+        [Parameter()]
+        [string]
+        $PassedSCAPFinding = "Vulnerability Closed by Automated Benchmark/SCAP Check.",
+
+        # Specify the Default Findings Result for checks that passed.
+        [Parameter()]
+        [string]
+        $FailedSCAPFinding = "Vulnerability Opened by Automated Benchmark/SCAP Check."
     )
 
     If ($PSBoundParameters['Debug']) { $DebugPreference = 'Continue' }
@@ -26,6 +44,14 @@ function Start-STIGCheck {
 
     # Import STIG Checklist
     $CKL = Import-Checklist -Path $Checklist
+
+    # Import SCAP Results if provided
+    if ($SCAPBenchmark) {
+
+        Write-Verbose "[$($MyInvocation.MyCommand)] Importing SCAP Results"
+
+        $SCAP = Get-SCAPResults -XccdfPath $SCAPBenchmark
+    }
 
     # Set Host Data.
     Set-ChecklistHostData -Checklist $CKL
@@ -47,17 +73,75 @@ function Start-STIGCheck {
         Try {
 
             Write-Verbose "[$($MyInvocation.MyCommand)] Running $STIG Check - $($($_.Name).split(".")[0])"
+
             Write-Debug "[$($MyInvocation.MyCommand)] Script Path: $PSScriptRoot\$STIG\$($_.Name)"
 
             # Perform Check
             $check = . "$PSScriptRoot\$STIG\$($_.Name)" $PreCheck
 
-            # Lookup
-            #TODO: Create function Grab predefined data points.
-            # Pull apart the fqdn to get the short domain name.
+            # Check SCAP Benchmark if provided.
+            if ($SCAPBenchmark) {
 
-            # Update Checklist
-            Set-ChecklistItem -Checklist $CKL @check
+                Write-Verbose "[$($MyInvocation.MyCommand)] retrieving Rule ID for '$($check.VulnID)'"
+
+                $ruleID = Get-FindingAttribute -Checklist $ckl -VulnID $check.VulnID  -Attribute "Rule_ID"
+
+                Write-Verbose "[$($MyInvocation.MyCommand)] Searching SCAP Benchmark for '$($check.VulnID)' [$ruleID]  status"
+
+                if ($SCAP.RuleID -contains $ruleID) {
+
+                    Write-Verbose "[$($MyInvocation.MyCommand)] Found SCAP data for '$($check.VulnID)' [$ruleID]"
+
+                    # See if the check passed or failed and update check.
+                    $scapResult = $($SCAP | Where-Object { $_.RuleID -eq $ruleID }).Result
+
+                    Write-Verbose "[$($MyInvocation.MyCommand)] Found SCAP Check '$($ruleID)' with a result of '$scapResult'"
+
+                    # if the scap result and check both pass
+                    if ($scapResult -eq "pass" -and $check.Status -eq "NotAFinding") {
+
+                        # Update Checklist
+                        Set-ChecklistItem -Checklist $CKL -VulnID $check.VulnID -Details $PassedSCAPFinding -Status "NotAFinding" #-Comments $check.Comments
+
+                    }
+                    # if scap result failed but the check passes
+                    elseif ($scapResult -eq "fail" -and $check.Status -eq "NotAFinding") {
+
+                        $comment = "SCAP found this as a fail but the automated check found it as Not a Finding. Review comments and update status."
+
+                        # Update Checklist
+                        Set-ChecklistItem -Checklist $CKL -VulnID $check.VulnID -Details $comment -Status "Open" #-Comments $check.Comments
+
+                    }
+                    # if scap result passed but the check failed
+                    elseif ($scapResult -eq "Pass" -and $check.Status -eq "Open") {
+
+                        $comment = "SCAP found this as a pass but the automated check found it as a Finding. Review comments and update status."
+
+                        # Update Checklist
+                        Set-ChecklistItem -Checklist $CKL -VulnID $check.VulnID -Details $comment -Status "Open" #-Comments $check.Comments
+
+                    }
+                    else {
+
+                        #TODO: Need review incase were missing an option
+                        #Set-ChecklistItem -Checklist $CKL -VulnID $check.VulnID -Comments $check.Comments
+                    }
+
+                    # Clear Entry from benchmark
+                    $SCAP = $SCAP | Where-Object { $_.RuleID -ne $ruleID }
+
+                }
+
+            }
+            else {
+
+                # Update Checklist
+                Set-ChecklistItem -Checklist $CKL @check
+
+            }
+
+
 
         }
         Catch {
@@ -66,7 +150,38 @@ function Start-STIGCheck {
 
     }
 
+    # Check remaining SCAP Entries and update checklist
+    if ($SCAPBenchmark) {
+
+        Write-Verbose "[$($MyInvocation.MyCommand)] Updating Checklist with Remaining SCAP Findings that didnt have an automated check."
+
+        $SCAP | ForEach-Object {
+
+            #TODO: Add a check to see if the ruleid has alread been updated, if so we need to add some safty logic so we dont overwrite the findings.
+            if ($_.result -eq "pass") {
+
+                Write-Verbose "[$($MyInvocation.MyCommand)] Updating $($_.RuleID) [Pass]"
+
+                # Update Checklist
+                Set-ChecklistItem -Checklist $CKL -RuleID $_.RuleID -Details $PassedSCAPFinding -Status "NotAFinding"
+
+            }
+            else {
+
+                Write-Verbose "[$($MyInvocation.MyCommand)] Updating $($_.RuleID) [Open]"
+
+                # Update Checklist
+                Set-ChecklistItem -Checklist $CKL -RuleID $_.RuleID -Details $FailedSCAPFinding -Status "Open"
+
+            }
+
+        }
+
+    }
+
     # Save Checklist
+    Write-Verbose "[$($MyInvocation.MyCommand)] Saving Updated Checklist"
+
     Export-Checklist -Checklist $CKL -Path $Checklist
 
     # Output How long it took
