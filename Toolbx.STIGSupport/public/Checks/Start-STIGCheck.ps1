@@ -101,35 +101,49 @@ function Start-STIGCheck {
                     if ($scapResult -eq "pass" -and $check.Status -eq "NotAFinding") {
 
                         # Update Checklist
-                        Set-ChecklistItem -Checklist $CKL -VulnID $check.VulnID -Details $PassedSCAPFinding -Status "NotAFinding" #-Comments $check.Comments
+                        Set-ChecklistItem -Checklist $CKL -VulnID $check.VulnID -Details $PassedSCAPFinding -Status "NotAFinding" -Comments $check.Comments
 
                     }
-                    # if scap result failed but the check passes
                     elseif ($scapResult -eq "fail" -and $check.Status -eq "NotAFinding") {
-
+                        # if scap result failed but the check passes
                         $comment = "SCAP found this as a fail but the automated check found it as Not a Finding. Review comments and update status."
 
                         # Update Checklist
-                        Set-ChecklistItem -Checklist $CKL -VulnID $check.VulnID -Details $comment -Status "Open" #-Comments $check.Comments
+                        Set-ChecklistItem -Checklist $CKL -VulnID $check.VulnID -Details $comment -Status "Open" -Comments $check.Comments
 
                     }
-                    # if scap result passed but the check failed
-                    elseif ($scapResult -eq "Pass" -and $check.Status -eq "Open") {
-
+                    elseif ($scapResult -eq "pass" -and $check.Status -eq "Open") {
+                        # if scap result passed but the check failed
                         $comment = "SCAP found this as a pass but the automated check found it as a Finding. Review comments and update status."
 
                         # Update Checklist
-                        Set-ChecklistItem -Checklist $CKL -VulnID $check.VulnID -Details $comment -Status "Open" #-Comments $check.Comments
+                        Set-ChecklistItem -Checklist $CKL -VulnID $check.VulnID -Details $comment -Status "Open" -Comments $check.Comments
+
+                    }
+                    elseif ($scapResult -eq "fail" -and $check.Status -eq "Open") {
+
+                        # Update Checklist
+                        Set-ChecklistItem -Checklist $CKL -VulnID $check.VulnID -Details $FailedSCAPFinding -Status "Open" -Comments $check.Comments
 
                     }
                     else {
 
+                        Write-Verbose "[$($MyInvocation.MyCommand)] Unkown Selection SCAP:'$scapResult' Check: '$($check.Status)'"
                         #TODO: Need review incase were missing an option
                         #Set-ChecklistItem -Checklist $CKL -VulnID $check.VulnID -Comments $check.Comments
+
                     }
 
                     # Clear Entry from benchmark
                     $SCAP = $SCAP | Where-Object { $_.RuleID -ne $ruleID }
+
+                }
+                else {
+
+                    Write-Verbose "[$($MyInvocation.MyCommand)] No SCAP Checks for '$($check.VulnID)'"
+
+                    # Update Checklist
+                    Set-ChecklistItem -Checklist $CKL -VulnID $check.VulnID -Details $FailedSCAPFinding -Status $check.Status -Comments $check.Comments
 
                 }
 
