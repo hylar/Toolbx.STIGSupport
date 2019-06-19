@@ -105,32 +105,34 @@ function Start-STIGCheck {
 
                     }
                     elseif ($scapResult -eq "fail" -and $check.Status -eq "NotAFinding") {
+
                         # if scap result failed but the check passes
                         $comment = "SCAP found this as a fail but the automated check found it as Not a Finding. Review comments and update status."
 
                         # Update Checklist
-                        Set-ChecklistItem -Checklist $CKL -VulnID $check.VulnID -Details $comment -Status "Open" -Comments $check.Comments
+                        Set-ChecklistItem -Checklist $CKL -VulnID $check.VulnID -Details "$comment`r`n`n$($check.Details)" -Status "Open" -Comments $check.Comments
 
                     }
                     elseif ($scapResult -eq "pass" -and $check.Status -eq "Open") {
+
                         # if scap result passed but the check failed
                         $comment = "SCAP found this as a pass but the automated check found it as a Finding. Review comments and update status."
 
                         # Update Checklist
-                        Set-ChecklistItem -Checklist $CKL -VulnID $check.VulnID -Details $comment -Status "Open" -Comments $check.Comments
+                        Set-ChecklistItem -Checklist $CKL -VulnID $check.VulnID -Details "$comment`r`n`n$($check.Details)" -Status "Open" -Comments $check.Comments
 
                     }
                     elseif ($scapResult -eq "fail" -and $check.Status -eq "Open") {
 
                         # Update Checklist
-                        Set-ChecklistItem -Checklist $CKL -VulnID $check.VulnID -Details $FailedSCAPFinding -Status "Open" -Comments $check.Comments
+                        Set-ChecklistItem -Checklist $CKL -VulnID $check.VulnID -Details "$FailedSCAPFinding`r`n`n$($check.Details)" -Status "Open" -Comments $check.Comments
 
                     }
                     else {
 
                         Write-Verbose "[$($MyInvocation.MyCommand)] Unkown Selection SCAP:'$scapResult' Check: '$($check.Status)'"
-                        #TODO: Need review incase were missing an option
-                        #Set-ChecklistItem -Checklist $CKL -VulnID $check.VulnID -Comments $check.Comments
+
+                        Set-ChecklistItem -Checklist $CKL -VulnID $check.VulnID -Details $check.Details -Status $check.Status -Comments $check.Comments
 
                     }
 
@@ -143,7 +145,7 @@ function Start-STIGCheck {
                     Write-Verbose "[$($MyInvocation.MyCommand)] No SCAP Checks for '$($check.VulnID)'"
 
                     # Update Checklist
-                    Set-ChecklistItem -Checklist $CKL -VulnID $check.VulnID -Details $FailedSCAPFinding -Status $check.Status -Comments $check.Comments
+                    Set-ChecklistItem -Checklist $CKL -VulnID $check.VulnID -Details $check.Details -Status $check.Status -Comments $check.Comments
 
                 }
 
@@ -154,8 +156,6 @@ function Start-STIGCheck {
                 Set-ChecklistItem -Checklist $CKL @check
 
             }
-
-
 
         }
         Catch {
