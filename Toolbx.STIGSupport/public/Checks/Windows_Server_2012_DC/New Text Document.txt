@@ -1,1 +1,0 @@
-The client could not connect to the remote computer. Remote connections might not be enabled or the computer might be too busy to accept new connections. It is also possible that network problems are preventing your connection. Please try connecting again later. If the problem continues to occur, contact your administrator.
